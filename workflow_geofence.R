@@ -8,7 +8,7 @@ map = read_sf("SUA_2016_AUST.shp/SUA_2016_AUST.shp")
 map <- filter(map,str_detect(map$SUA_NAME16,"Not in any Significant Urban Area")==FALSE)
 
 # Now create a grid of all global points at 0.1 degree resolution
-global.0.1 <- expand_grid(lat = seq(-42.0,-9,0001), lon = seq(110,155.0,0.01))
+global.0.1 <- expand_grid(lat = seq(-32.336,-32.131,0.0001), lon = seq(152.45,152.57,0.0001))
 
 # Convert the points of the matrix to coordinates compatible with sf objects
 pnts_sf <- st_as_sf(global.0.1, coords = c('lon', 'lat'), crs = st_crs(map))
@@ -30,8 +30,8 @@ inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>%
   ) %>%
   separate(geometry, c("lon", "lat"), ", ") %>%
   mutate(
-    lon=format(round(as.numeric(lon), digits=2)) ,
-    lat=format(round(as.numeric(lat), digits=2)) ,
+    lon=round(as.numeric(lon), digits=4) ,
+    lat=round(as.numeric(lat), digits=4) ,
     key = str_c(lon,lat,sep = "|")) %>%
   select(-intersection)
 
