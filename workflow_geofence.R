@@ -8,10 +8,10 @@ map = read_sf("SUA_2016_AUST.shp/SUA_2016_AUST.shp")
 map <- filter(map,str_detect(map$SUA_NAME16,"Not in any Significant Urban Area")==FALSE)
 
 # Now create a grid of all global points at 0.1 degree resolution
-global.0.1 <- expand_grid(lon = seq(-40.0,-10,0.01), lat = seq(110,150.0,0.01))
+global.0.1 <- expand_grid(lat = seq(-42.0,-9,0.01), lon = seq(110,155.0,0.01))
 
 # Convert the points of the matrix to coordinates compatible with sf objects
-pnts_sf <- st_as_sf(global.0.1, coords = c('lat', 'lon'), crs = st_crs(map))
+pnts_sf <- st_as_sf(global.0.1, coords = c('lon', 'lat'), crs = st_crs(map))
 
 # Find the intersections of the points and the template map
 pnts.intersection <- pnts_sf %>% mutate(
@@ -25,19 +25,15 @@ inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>%
   mutate(
     geometry = as.character(geometry),
     geometry=str_sub(string = geometry,start = 3,end = str_length(geometry)-1),
+
     area = as.factor(area)
   ) %>%
-  separate(geometry, c("lat", "lon"), ", ")
-
-
-)
-
-
-%>%
+  separate(geometry, c("lon", "lat"), ", ") %>%
   mutate(
-)
+    lon=format(round(as.numeric(lon), digits=2)) ,
+    lat=format(round(as.numeric(lat), digits=2)) ,
+    key = str_c(lon,lat,sep = "|")) %>%
+  select(-intersection)
 
 
-out<-
-
-
+write_csv(inside.polygons,"geofence.data.csv")
