@@ -133,10 +133,10 @@ But as resolution goes up, so the number of points in the matrix expands hugely
 
 |resolution degrees  | GPS decimal places | resolution (at equator) | points in matrix|  
 | ------------------ | ------------------ | ------------------------| --------------- |  
-| 0.01 | 3 |1.1 km   | 273 |  
-| 0.001 | 4| 100 m   | 24,926 |  
-| 0.0001 | 5| 10 m   | 2,463,251 |  
-| 0.00001 | 6| 1 m   | 246,020,500 |  
+| 0.01 | 2 |1.1 km   | 273 |  
+| 0.001 | 3| 100 m   | 24,926 |  
+| 0.0001 | 4 | 10 m   | 2,463,251 |  
+| 0.00001 | 5 | 1 m   | 246,020,500 |  
 
 Remembering that the best resolution the average GPS receiver on a phone will get is about 10 m, we benchmarked performance with 10 metre resolution or 4 decimal places. Conveniently this is also the resolution of the maps that provide the shapefiles.
 
