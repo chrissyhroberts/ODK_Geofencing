@@ -8,7 +8,7 @@ map = read_sf("SUA_2016_AUST.shp/SUA_2016_AUST.shp")
 map <- filter(map,str_detect(map$SUA_NAME16,"Not in any Significant Urban Area")==FALSE)
 
 # Now create a grid of all global points at 0.1 degree resolution
-global.0.1 <- expand_grid(lat = seq(-42.0,-9,0.01), lon = seq(110,155.0,0.01))
+global.0.1 <- expand_grid(lat = seq(-42.0,-9,0001), lon = seq(110,155.0,0.01))
 
 # Convert the points of the matrix to coordinates compatible with sf objects
 pnts_sf <- st_as_sf(global.0.1, coords = c('lon', 'lat'), crs = st_crs(map))
