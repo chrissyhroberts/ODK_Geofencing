@@ -25,6 +25,7 @@ The table demonstrates the relationship between resolution, distance and number 
 | 1.0 degree | 111 km   |360  | 0.13 million|
 | 0.1 degree | 11.1 km  |3600 | 13 million|
 | 0.01 degree| 1.1 km   |36000 | 130 million |  
+ 
 
 For practical purposes the matrix should be (1) as high resolution as possible and (2) geographically limited to the regions of interest. 
 
@@ -68,25 +69,23 @@ pnts.intersection <- pnts_sf %>% mutate(
 ```
 
 * filter the resulting table to include only data points that are inside polygons
-```
-inside.polygons<-filter(pnts.intersection,area!="")
-inside.polygons<-inside.polygons %>% mutate(
-  geometry=str_sub(string = geometry,start = 3,end = str_length(geometry)-1)
-)
-```
-* Tidy this up so that lat and lon are in different fields, and provide the name of the area in the third column
+ * Tidy this up so that lat and lon are in different fields, and provide the name of the area in the third column
 
 ```
-inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>% 
+inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>%
   mutate(
     geometry = as.character(geometry),
     geometry=str_sub(string = geometry,start = 3,end = str_length(geometry)-1),
-    
+
     area = as.factor(area)
-  ) %>% 
-  separate(geometry, c("lon", "lat"), ", ") %>% 
-  mutate(key = str_c(lon,lat,sep = "|")) %>% 
+  ) %>%
+  separate(geometry, c("lon", "lat"), ", ") %>%
+  mutate(
+    lon=format(round(as.numeric(lon), digits=2)) ,
+    lat=format(round(as.numeric(lat), digits=2)) ,
+    key = str_c(lon,lat,sep = "|")) %>%
   select(-intersection)
+
 ```
 
 * Finally, export the list to a csv file, which we will use in ODK
@@ -119,9 +118,13 @@ The XLSForm is very simple. It consists of
 
 This image shows a negative result, with the geopoint just outside the limits of the Forster - Tuncurry area
 
-![](outside.png)
+![](img/outside.png)
 
 Whilst this one shows a positive result, with the geopoint well inside the limits of Forster - Tuncurry area
+
+![](img/inside.png)
+
+
 
 
 
