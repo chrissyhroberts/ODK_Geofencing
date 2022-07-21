@@ -33,7 +33,7 @@ inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>%
     lon=round(as.numeric(lon), digits=4) ,
     lat=round(as.numeric(lat), digits=4) ,
     key = str_c(lon,lat,sep = "|")) %>%
-  select(-intersection)
+  select(-intersection,-lon,-lat)
 
 
 write_csv(inside.polygons,"geofence.data.csv")
