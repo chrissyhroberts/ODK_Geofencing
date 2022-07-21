@@ -1,4 +1,4 @@
-# ODK_Geofencing
+# ODK Geofencing
 
 This repo provides methods for [geofencing](https://en.wikipedia.org/wiki/Geo-fence) GPS data in ODK, KoBoToolbox, Ona, Survey CTO &amp; CommCare. To reproduce the work, you'll need some limited knowledge of how to use [R](https://www.r-project.org/) and of how to design and use [XLSforms](xlsform.org). 
 
@@ -28,9 +28,9 @@ The table demonstrates the relationship between resolution, distance and number 
 
 For practical purposes the matrix should be (1) as high resolution as possible and (2) geographically limited to the regions of interest. 
 
-## Example
+## Example : Part 1 - Creating the geofence
 
-In practice it wouldn't make a lot of sense to make a grid for the whole of the Earth at very high resolution, as you're likely to be working on a more controlled area and the data set would get very big. So let's take Australia as an example. You'll find Australia within the bounds of latitude -40.0 to -10,0.01 and longitude 110 to 150.0 so the matrix need only extend to these coordinates. 
+In practice it wouldn't make a lot of sense to make a grid for the whole of the Earth at very high resolution, as you're likely to be working on a more controlled area and the data set would get very big. So let's take Australia as an example. You'll find Australia within the bounds of latitude -42.0 to -10,0.01 and longitude 110 to 155.0, so the matrix need only extend to these coordinates. 
 
 At 0.01 (1.1km) resolution, a decomposed grid of points covering the whole of Australia is about 12 million points. 
 
@@ -74,8 +74,54 @@ inside.polygons<-inside.polygons %>% mutate(
   geometry=str_sub(string = geometry,start = 3,end = str_length(geometry)-1)
 )
 ```
+* Tidy this up so that lat and lon are in different fields, and provide the name of the area in the third column
+
+```
+inside.polygons<-tibble(filter(pnts.intersection,area!="")) %>% 
+  mutate(
+    geometry = as.character(geometry),
+    geometry=str_sub(string = geometry,start = 3,end = str_length(geometry)-1),
+    
+    area = as.factor(area)
+  ) %>% 
+  separate(geometry, c("lon", "lat"), ", ") %>% 
+  mutate(key = str_c(lon,lat,sep = "|")) %>% 
+  select(-intersection)
+```
+
+* Finally, export the list to a csv file, which we will use in ODK
+
+```
+write_csv(inside.polygons,"geofence.data.csv")
+```
+
+## Geofence in decomposed CSV format
+
+The CSV file we just created for Australia at 0.01 degree resolution had 26,000 points that fell within polygons. The table below is a sample of lines
+
+![](img/data_in.png)
 
 
+## Example : Part 2 - Creating an XLS Form that uses the geofence
+ 
+The XLSForm is very simple. It consists of 
+
+* A geopoint question, which captures the point that will be tested against the polygons. Here it is a `placement-map` type, but this works with GPS collected data too.
+* A pair of calculations, which extract the first (Latitude) and second (Longitude) data points from the geopoint. These are rounded to the same resolution as the polygon data (here 2 decimal places, 0.01 degrees)
+* Another calculation, which concatenates the resolution-matched geopoint data in the same format found in the geofence data set
+* A note, which displays the resolution-matched geopoint 
+* A further calculation, which grabs exactly zero or one line of matching data from the geofence data set, which is sideloaded as a csv file
+* A note, which displays the name of the matching polygon
+
+![](img/xlsform.png)
+
+## Example : Part 3 - In action
+
+This image shows a negative result, with the geopoint just outside the limits of the Forster - Tuncurry area
+
+![](outside.png)
+
+Whilst this one shows a positive result, with the geopoint well inside the limits of Forster - Tuncurry area
 
 
 
