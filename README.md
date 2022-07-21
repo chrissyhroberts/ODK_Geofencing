@@ -25,7 +25,7 @@ The table demonstrates the relationship between resolution, distance and number 
 | 1.0 degree | 111 km   |360  | 0.13 million|
 | 0.1 degree | 11.1 km  |3600 | 13 million|
 | 0.01 degree| 1.1 km   |36000 | 130 million |  
- 
+
 
 For practical purposes the matrix should be (1) as high resolution as possible and (2) geographically limited to the regions of interest. 
 
@@ -96,7 +96,7 @@ write_csv(inside.polygons,"geofence.data.csv")
 
 ## Geofence in decomposed CSV format
 
-The CSV file we just created for Australia at 0.01 degree resolution had 26,000 points that fell within polygons. The table below is a sample of lines
+The CSV file we just created for Australia at 0.01 degree resolution had 46,000 points that fell within polygons. The table below is a sample of lines
 
 ![](img/data_in.png)
 
@@ -123,6 +123,45 @@ This image shows a negative result, with the geopoint just outside the limits of
 Whilst this one shows a positive result, with the geopoint well inside the limits of Forster - Tuncurry area
 
 ![](img/inside.png)
+
+## Performance
+
+This works fast with 46000 lines (CSV was 1.6 MB) in the geopoint data. We recommend never feeding this a massive data set, but to reduce the geographical scale as you increase the resolution. Remember that XLSForms store GPS data at 6 decimal places, but you aren't going to get this system to work at that level!
+
+To give an example of why not, look at this. Forster - Tuncurry is about 45 km^2. Not a huge area. 
+But as resolution goes up, so the number of points in the matrix expands hugely
+
+|resolution degrees  | GPS decimal places | resolution (at equator) | points in matrix|  
+| ------------------ | ------------------ | ------------------------| --------------- |  
+| 0.01 | 3 |1.1 km   | 273 |  
+| 0.001 | 4| 100 m   | 24,926 |  
+| 0.0001 | 5| 10 m   | 2,463,251 |  
+| 0.00001 | 6| 1 m   | 246,020,500 |  
+
+Remembering that the best resolution the average GPS receiver on a phone will get is about 10 m, we benchmarked performance with 10 metre resolution or 4 decimal places. Conveniently this is also the resolution of the maps that provide the shapefiles.
+
+The CSV file is now ~26 MB. Pretty big
+
+The form loads on Enketo in about 8 seconds.
+
+The resolution is also great
+
+Look at the boundary of the polygon for Forster - Tuncurry. North of the bridge is inside. South is outside.
+![](img/bridge3.png)
+
+If we place a marker in ODK on the bridge, it detects the point as being inside the polygon
+
+![](img/bridge2.png)
+
+But about 10 m south, it detects the point as being outside the polygon
+
+![](img/bridge1.png)
+
+On ODK Collect, the first time you use this form it will pre-load the data from the CSV, which took about 20 seconds. On subsequent uses, it takes no time at all!
+
+
+
+
 
 
 
